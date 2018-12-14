@@ -5,8 +5,13 @@ import classnames from 'classnames';
 import { Link } from 'react-router-dom';
 
 import { deletePost, addLike, removeLike } from '../../actions/postActions';
+import { getProfiles } from '../../actions/profileActions';
 
 class PostItem extends Component {
+  componentDidMount = () => {
+    this.props.getProfiles();
+  };
+
   onDeleteClick = (id) => {
     this.props.deletePost(id);
   };
@@ -28,22 +33,45 @@ class PostItem extends Component {
     }
   };
 
+  findHandleProfile = (profiles, postUser) => {
+    let handle;
+    if (profiles !== null && profiles.length > 0) {
+      profiles.forEach((profile) => {
+        if (profile.user._id === postUser) {
+          handle = profile.handle;
+        }
+      });
+    }
+    return handle;
+  };
+
   render() {
     const { post, auth, showActions } = this.props;
+
+    const { profiles } = this.props.profile;
 
     return (
       <div className="card card-body mb-3">
         <div className="row">
           <div className="col-md-2">
-            <a href="profile.html">
+            <Link
+              to={`/profile/${this.findHandleProfile(profiles, post.user)}`}
+            >
               <img
                 className="rounded-circle d-none d-md-block"
                 src={post.avatar}
                 alt=""
               />
-            </a>
+            </Link>
             <br />
-            <p className="text-center">{post.name}</p>
+
+            <p className="text-center">
+              <Link
+                to={`/profile/${this.findHandleProfile(profiles, post.user)}`}
+              >
+                {post.name}
+              </Link>
+            </p>
           </div>
           <div className="col-md-10">
             <p className="lead">{post.text}</p>
@@ -94,8 +122,10 @@ PostItem.propTypes = {
   deletePost: PropTypes.func.isRequired,
   addLike: PropTypes.func.isRequired,
   removeLike: PropTypes.func.isRequired,
+  getProfiles: PropTypes.func.isRequired,
   post: PropTypes.object.isRequired,
-  auth: PropTypes.object.isRequired
+  auth: PropTypes.object.isRequired,
+  profile: PropTypes.object.isRequired
 };
 
 PostItem.defaultProps = {
@@ -103,10 +133,11 @@ PostItem.defaultProps = {
 };
 
 const mapStateToProps = (state) => ({
-  auth: state.auth
+  auth: state.auth,
+  profile: state.profile
 });
 
 export default connect(
   mapStateToProps,
-  { deletePost, addLike, removeLike }
+  { deletePost, addLike, removeLike, getProfiles }
 )(PostItem);

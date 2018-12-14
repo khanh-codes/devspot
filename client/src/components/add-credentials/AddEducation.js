@@ -123,7 +123,7 @@ class AddEducation extends Component {
                   id="current"
                 />
                 <label htmlFor="current" className="form-heck-label">
-                  Current Job
+                  Currently Attending
                 </label>
               </div>
               <TextAreaFieldGroup
